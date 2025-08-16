@@ -1,3 +1,123 @@
+//
+///*
+// * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// *
+// * WSO2 Inc. licenses this file to you under the Apache License,
+// * Version 2.0 (the "License"); you may not use this file except
+// * in compliance with the License.
+// * You may obtain a copy of the License at
+// *
+// * http://www.apache.org/licenses/LICENSE-2.0
+// *
+// * Unless required by applicable law or agreed to in writing,
+// * software distributed under the License is distributed on an
+// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// * KIND, either express or implied.  See the License for the
+// * specific language governing permissions and limitations
+// * under the License.
+// */
+//
+//package org.wso2.carbon.identity.hash.provider.bcrypt;
+//
+//
+//
+//import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
+//import org.wso2.carbon.identity.hash.provider.bcrypt.constant.Constants;
+//import org.wso2.carbon.user.core.exceptions.HashProviderClientException;
+//import org.wso2.carbon.user.core.exceptions.HashProviderException;
+//import org.wso2.carbon.user.core.exceptions.HashProviderServerException;
+//import org.wso2.carbon.user.core.hash.HashProvider;
+//
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
+//
+//import java.nio.charset.StandardCharsets;
+//import java.util.HashMap;
+//import java.util.Map;
+//
+//
+///**
+// * This class contains the implementation of the Bcrypt hashing algorithm.
+// */
+//public class BcryptHashProvider implements HashProvider {
+//
+//    private static final Log log = LogFactory.getLog(BcryptHashProvider.class);
+//
+//    private int costFactor;
+//
+//    @Override
+//    public void init() {
+//        // Set a default cost factor if no properties are provided.
+//        costFactor = Constants.DEFAULT_COST_FACTOR;
+//    }
+//
+//    @Override
+//    public void init(Map<String, Object> initProperties) throws HashProviderException {
+//        init();
+//        Object costFactorObject = initProperties.get(Constants.COST_FACTOR_PROPERTY);
+//
+//        if (costFactorObject != null) {
+//            try {
+//                costFactor = Integer.parseInt(costFactorObject.toString());
+//            } catch (NumberFormatException e) {
+//                String msg = "Invalid value for the Bcrypt cost factor. It must be an integer.";
+//                throw new HashProviderClientException(msg, e);
+//            }
+//            validateCostFactor(costFactor);
+//        }
+//    }
+//
+//    @Override
+//    public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
+//        // --- IMPORTANT: Password Length Validation ---
+//        // Bcrypt has a hard limit of 72 bytes for the plaintext password.
+//        // Passwords longer than this are silently truncated, which is a security vulnerability.
+//        // This check prevents that behavior.
+//        if (plainText.length > 72) {
+//            String msg = "Password length exceeds the maximum allowed by Bcrypt (72 characters).";
+//            throw new HashProviderClientException(msg);
+//        }
+//
+//        try {
+//            // The Bcrypt algorithm handles salting internally, so we don't need the salt
+//            // passed as a separate parameter in the final hash.
+//            // The `generate` method from Bouncy Castle takes the salt and the password.
+//            String bcryptHash = OpenBSDBCrypt.generate(plainText, salt.getBytes(StandardCharsets.UTF_8), costFactor);
+//            return bcryptHash.getBytes(StandardCharsets.UTF_8);
+//        } catch (Exception e) {
+//            String msg = "Error occurred while generating bcrypt hash.";
+//            log.error(msg, e);
+//            throw new HashProviderServerException(msg, e);
+//        }
+//    }
+//
+//    @Override
+//    public Map<String, Object> getParameters() {
+//        Map<String, Object> bcryptHashProviderParams = new HashMap<>();
+//        bcryptHashProviderParams.put(Constants.COST_FACTOR_PROPERTY, costFactor);
+//        return bcryptHashProviderParams;
+//    }
+//
+//    @Override
+//    public String getAlgorithm() {
+//        return Constants.BCRYPT_HASHING_ALGORITHM;
+//    }
+//
+//    /**
+//     * This method is responsible for validating the cost factor.
+//     *
+//     * @param costFactor The cost factor to be validated.
+//     * @throws HashProviderClientException If the cost factor is less than or equal to zero.
+//     */
+//    private void validateCostFactor(int costFactor) throws HashProviderClientException {
+//        if (costFactor <= 0) {
+//            String msg = "Bcrypt cost factor must be a positive integer.";
+//            throw new HashProviderClientException(msg);
+//        }
+//    }
+//}
+
+
 /*
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -18,225 +138,106 @@
 
 package org.wso2.carbon.identity.hash.provider.bcrypt;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.wso2.carbon.identity.hash.provider.bcrypt.constant.Constants;
 import org.wso2.carbon.user.core.exceptions.HashProviderClientException;
 import org.wso2.carbon.user.core.exceptions.HashProviderException;
 import org.wso2.carbon.user.core.exceptions.HashProviderServerException;
 import org.wso2.carbon.user.core.hash.HashProvider;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-
 /**
- * This class contains the implementation of PBKDF2 hashing algorithm.
+ * This class contains the implementation of the Bcrypt hashing algorithm.
  */
 public class BcryptHashProvider implements HashProvider {
 
     private static final Log log = LogFactory.getLog(BcryptHashProvider.class);
+    // Bcrypt has a hard limit of 72 bytes for the plaintext password.
+    private static final int BCRYPT_MAX_PLAINTEXT_LENGTH = 72;
 
-    private String pseudoRandomFunction;
-    private int dkLength;
-    private int iterationCount;
-    private SecretKeyFactory skf;
+    private int costFactor;
 
     @Override
     public void init() {
-
-        pseudoRandomFunction = Constants.DEFAULT_PBKDF2_PRF;
-        dkLength = Constants.DEFAULT_DERIVED_KEY_LENGTH;
-        iterationCount = Constants.DEFAULT_ITERATION_COUNT;
-        try {
-            skf = SecretKeyFactory.getInstance(pseudoRandomFunction);
-        } catch (NoSuchAlgorithmException e) {
-            log.error(String.format(ErrorMessage.ERROR_CODE_NO_SUCH_ALGORITHM.getDescription(), pseudoRandomFunction),
-                    e);
-        }
+        // Set a default cost factor if no properties are provided.
+        costFactor = Constants.DEFAULT_COST_FACTOR;
     }
 
     @Override
     public void init(Map<String, Object> initProperties) throws HashProviderException {
-
         init();
-        Object iterationCountObject = initProperties.get(Constants.ITERATION_COUNT_PROPERTY);
-        Object dkLengthObject = initProperties.get(Constants.DERIVED_KEY_LENGTH_PROPERTY);
-        Object pseudoRandomFunctionObject = initProperties.get(Constants.PSEUDO_RANDOM_FUNCTION_PROPERTY);
+        Object costFactorObject = initProperties.get(Constants.COST_FACTOR_PROPERTY);
 
-        if (iterationCountObject != null) {
-            if (iterationCountObject instanceof String) {
-                try {
-                    iterationCount = Integer.parseInt(iterationCountObject.toString());
-                } catch (NumberFormatException e) {
-                    throw new HashProviderClientException(
-                            ErrorMessage.ERROR_CODE_INVALID_ITERATION_COUNT.getDescription(),
-                            Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                                    ErrorMessage.ERROR_CODE_INVALID_ITERATION_COUNT.getCode());
-                }
-                validateIterationCount(iterationCount);
-            }
-        }
-        if (dkLengthObject != null) {
-            if (dkLengthObject instanceof String) {
-                try {
-                    dkLength = Integer.parseInt(dkLengthObject.toString());
-                } catch (NumberFormatException e) {
-                    throw new HashProviderClientException(
-                            ErrorMessage.ERROR_CODE_INVALID_DERIVED_KEY_LENGTH.getDescription(),
-                            Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                                    ErrorMessage.ERROR_CODE_INVALID_DERIVED_KEY_LENGTH.getCode());
-                }
-                validateDerivedKeyLength(dkLength);
-            }
-        }
-        if (pseudoRandomFunctionObject != null) {
-            pseudoRandomFunction = (String) pseudoRandomFunctionObject;
+        if (costFactorObject != null) {
             try {
-                skf = SecretKeyFactory.getInstance(pseudoRandomFunction);
-            } catch (NoSuchAlgorithmException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(String.format(ErrorMessage.ERROR_CODE_NO_SUCH_ALGORITHM.getDescription(),
-                            pseudoRandomFunction), e);
-                }
-                throw new HashProviderServerException(pseudoRandomFunction + " " +
-                        ErrorMessage.ERROR_CODE_NO_SUCH_ALGORITHM.getDescription(),
-                        Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX + ErrorMessage.ERROR_CODE_NO_SUCH_ALGORITHM
-                                .getCode());
+                costFactor = Integer.parseInt(costFactorObject.toString());
+            } catch (NumberFormatException e) {
+                String msg = "Invalid value for the Bcrypt cost factor. It must be an integer.";
+                throw new HashProviderClientException(msg, e);
             }
+            validateCostFactor(costFactor);
         }
     }
 
     @Override
     public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
 
-        validateEmptyValue(plainText);
-        validateEmptySalt(salt);
-        return generateHash(plainText, salt, iterationCount, dkLength);
+        // Validate password length based on byte size, not character count.
+        if (getByteLength(plainText) > BCRYPT_MAX_PLAINTEXT_LENGTH) {
+            String msg = "Password length exceeds the maximum allowed by Bcrypt (72 bytes).";
+            throw new HashProviderClientException(msg);
+        }
+
+        try {
+            // OpenBSDBCrypt.generate handles salt generation internally,
+            // so the 'salt' parameter passed to this method is not directly used for salting the hash.
+            String bcryptHash = OpenBSDBCrypt.generate(plainText, salt.getBytes(StandardCharsets.UTF_8), costFactor);
+            return bcryptHash.getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            String msg = "Error occurred while generating bcrypt hash.";
+            log.error(msg, e);
+            throw new HashProviderServerException(msg, e);
+        }
     }
 
     @Override
     public Map<String, Object> getParameters() {
-
-        Map<String, Object> pbkdf2HashProviderParams = new HashMap<>();
-        pbkdf2HashProviderParams.put(Constants.ITERATION_COUNT_PROPERTY, iterationCount);
-        pbkdf2HashProviderParams.put(Constants.DERIVED_KEY_LENGTH_PROPERTY, dkLength);
-        pbkdf2HashProviderParams.put(Constants.PSEUDO_RANDOM_FUNCTION_PROPERTY, pseudoRandomFunction);
-        return pbkdf2HashProviderParams;
+        Map<String, Object> bcryptHashProviderParams = new HashMap<>();
+        bcryptHashProviderParams.put(Constants.COST_FACTOR_PROPERTY, costFactor);
+        return bcryptHashProviderParams;
     }
 
     @Override
     public String getAlgorithm() {
-
-        return Constants.PBKDF2_HASHING_ALGORITHM;
+        return Constants.BCRYPT_HASHING_ALGORITHM;
     }
 
     /**
-     * Generate hash value according to the given parameters.
+     * This method is responsible for validating the cost factor.
      *
-     * @param plainText            The plain text value to be hashed.
-     * @param salt                 The salt.
-     * @param iterationCount       Number of iterations to be used by the PRF.
-     * @param dkLength             The output length of the hash function.
-     * @return The resulting hash value of the value.
-     * @throws HashProviderException If an error occurred while generating the hash.
+     * @param costFactor The cost factor to be validated.
+     * @throws HashProviderClientException If the cost factor is less than or equal to zero.
      */
-    private byte[] generateHash(char[] plainText, String salt, int iterationCount, int dkLength)
-            throws HashProviderException {
-
-        try {
-            PBEKeySpec spec = new PBEKeySpec(plainText, base64ToByteArray(salt), iterationCount, dkLength);
-            return skf.generateSecret(spec).getEncoded();
-        } catch (InvalidKeySpecException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(ErrorMessage.ERROR_CODE_INVALID_KEY_SPEC.getDescription(), e);
-            }
-            throw new HashProviderServerException(ErrorMessage.ERROR_CODE_INVALID_KEY_SPEC.getDescription(),
-                    Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                            ErrorMessage.ERROR_CODE_INVALID_KEY_SPEC.getCode());
+    private void validateCostFactor(int costFactor) throws HashProviderClientException {
+        if (costFactor <= 0) {
+            String msg = "Bcrypt cost factor must be a positive integer.";
+            throw new HashProviderClientException(msg);
         }
     }
 
     /**
-     * This method is responsible fpr validating the value to be hashed.
+     * Get the byte length of the character array.
      *
-     * @param plainText The value which needs to be hashed.
-     * @throws HashProviderClientException If the hash value is not provided.
+     * @param chars The character array.
+     * @return The byte length of the character array.
      */
-    private void validateEmptyValue(char[] plainText) throws HashProviderClientException {
-
-        if (plainText.length == 0) {
-            throw new HashProviderClientException(
-                    ErrorMessage.ERROR_CODE_EMPTY_VALUE.getDescription(),
-                    Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                            ErrorMessage.ERROR_CODE_EMPTY_VALUE.getCode());
-        }
-    }
-
-    /**
-     * This method is responsible for validating the salt.
-     *
-     * @param salt The salt which needs to be validated.
-     * @throws HashProviderClientException If the salt value is blank.
-     */
-    private void validateEmptySalt(String salt) throws HashProviderClientException {
-
-        if (StringUtils.isBlank(salt)) {
-            throw new HashProviderClientException(
-                    ErrorMessage.ERROR_CODE_EMPTY_SALT_VALUE.getDescription(),
-                    Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                            ErrorMessage.ERROR_CODE_EMPTY_SALT_VALUE.getCode());
-        }
-    }
-
-    /**
-     * This method is responsible for validating the iteration count.
-     *
-     * @param iterationCount The iteration count needs to be validated.
-     * @throws HashProviderClientException If the iteration count is negative or equal to zero.
-     */
-    private void validateIterationCount(int iterationCount) throws HashProviderClientException {
-
-        if (iterationCount <= 0) {
-            throw new HashProviderClientException(
-                    ErrorMessage.ERROR_CODE_INVALID_ITERATION_COUNT.getDescription(),
-                    Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                            ErrorMessage.ERROR_CODE_INVALID_ITERATION_COUNT.getCode());
-        }
-    }
-
-    /**
-     * This method is responsible for validating the derived key length.
-     *
-     * @param dkLength The derived key length needs to be validated.
-     * @throws HashProviderClientException If the derived key length is negative or equal to zero.
-     */
-    private void validateDerivedKeyLength(int dkLength) throws HashProviderClientException {
-
-        if (dkLength <= 0) {
-            throw new HashProviderClientException(
-                    ErrorMessage.ERROR_CODE_INVALID_DERIVED_KEY_LENGTH.getDescription(),
-                    Constants.PBKDF2_HASH_PROVIDER_ERROR_PREFIX +
-                            ErrorMessage.ERROR_CODE_INVALID_DERIVED_KEY_LENGTH.getCode());
-        }
-    }
-
-    /**
-     * This method is responsible for converting the base64 string value value of salt to byte array.
-     *
-     * @param salt The salt.
-     * @return The converted byte array from base64 salt value.
-     */
-    private byte[] base64ToByteArray(String salt) {
-
-        byte[] name = Base64.getEncoder().encode(salt.getBytes(StandardCharsets.UTF_8));
-        return (Base64.getDecoder().decode(name));
+    private int getByteLength(char[] chars) {
+        return new String(chars).getBytes(StandardCharsets.UTF_8).length;
     }
 }

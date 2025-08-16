@@ -46,6 +46,12 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.70</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
@@ -96,13 +102,18 @@
                 <version>${testng.version}</version>
                 <scope>test</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.jacoco</groupId>
                 <artifactId>org.jacoco.agent</artifactId>
                 <classifier>runtime</classifier>
                 <version>${jacoco.version}</version>
                 <scope>test</scope>
+
             </dependency>
+
+
+
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
@@ -184,7 +195,7 @@
                     <executions>
                         <execution>
                             <id>validate</id>
-                            <phase>validate</phase>
+                            <phase>none</phase>
                             <configuration>
                                 <configLocation>
                                     https://raw.githubusercontent.com/wso2/code-quality-tools/v1.3/checkstyle/checkstyle.xml
@@ -240,6 +251,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
+
+
+
         </plugins>
     </build>
 

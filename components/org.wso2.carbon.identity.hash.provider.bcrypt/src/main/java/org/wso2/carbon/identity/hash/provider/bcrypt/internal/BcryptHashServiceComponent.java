@@ -1,3 +1,6 @@
+
+
+
 /*
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -28,10 +31,10 @@ import org.wso2.carbon.identity.hash.provider.bcrypt.BcryptHashProviderFactory;
 import org.wso2.carbon.user.core.hash.HashProviderFactory;
 
 /**
- * This class contains the PBKDF2 hashing service component.
+ * This class contains the Bcrypt hashing service component.
  */
 @Component(
-        name = "org.wso2.carbon.identity.hash.provider.pbkdf2.component",
+        name = "org.wso2.carbon.identity.hash.provider.bcrypt.component",
         immediate = true
 )
 public class BcryptHashServiceComponent {
@@ -47,10 +50,10 @@ public class BcryptHashServiceComponent {
                     hashProviderFactory, null);
 
             if (log.isDebugEnabled()) {
-                log.debug("PBKDF2 bundle activated successfully.");
+                log.debug("Bcrypt bundle activated successfully.");
             }
         } catch (Throwable e) {
-            log.error("Failed to activate PBKDF bundle", e);
+            log.error("Failed to activate Bcrypt bundle", e);
         }
     }
 
@@ -58,7 +61,7 @@ public class BcryptHashServiceComponent {
     protected void deactivate(ComponentContext ctxt) {
 
         if (log.isDebugEnabled()) {
-            log.debug("PBKDF2 bundle is deactivated ");
+            log.debug("Bcrypt bundle is deactivated.");
         }
     }
 }

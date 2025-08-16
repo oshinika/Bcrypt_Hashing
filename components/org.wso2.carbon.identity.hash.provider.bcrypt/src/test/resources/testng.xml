@@ -21,8 +21,8 @@
 <suite name="org.wso2.carbon.identity.hash.provider.bcrypt">
     <test name="org.wso2.carbon.identity.hash.provider.bcrypt" preserve-order="false" parallel="false">
         <classes>
-            <class name="org.wso2.carbon.identity.hash.provider.bcrypt.PBKDF2HashProviderTest"/>
-            <class name="org.wso2.carbon.identity.hash.provider.bcrypt.PBKDF2HashProviderFactoryTest"/>
+            <class name="org.wso2.carbon.identity.hash.provider.bcrypt.BcryptHashProviderTest"/>
+            <class name="org.wso2.carbon.identity.hash.provider.bcrypt.BcryptHashProviderFactoryTest"/>
         </classes>
     </test>
 </suite>

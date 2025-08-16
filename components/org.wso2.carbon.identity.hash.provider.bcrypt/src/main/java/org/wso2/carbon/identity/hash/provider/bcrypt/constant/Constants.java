@@ -23,18 +23,28 @@ package org.wso2.carbon.identity.hash.provider.bcrypt.constant;
  */
 public class Constants {
 
-    public static final String PBKDF2_HASH_PROVIDER_ERROR_PREFIX = "PB2-";
+//    public static final String PBKDF2_HASH_PROVIDER_ERROR_PREFIX = "PB2-";
+//
+//    public static final String PSEUDO_RANDOM_FUNCTION_PROPERTY = "pbkdf2.prf";
+//    public static final String ITERATION_COUNT_PROPERTY = "pbkdf2.iteration.count";
+//    public static final String DERIVED_KEY_LENGTH_PROPERTY = "pbkdf2.dkLength";
+//
+//    public static final String PBKDF2_HASHING_ALGORITHM = "PBKDF2";
+//    public static final String DEFAULT_PBKDF2_PRF = "PBKDF2WithHmacSHA256";
+//    public static final int DEFAULT_ITERATION_COUNT = 10000;
+//    public static final int DEFAULT_DERIVED_KEY_LENGTH = 256;
 
-    public static final String PSEUDO_RANDOM_FUNCTION_PROPERTY = "pbkdf2.prf";
-    public static final String ITERATION_COUNT_PROPERTY = "pbkdf2.iteration.count";
-    public static final String DERIVED_KEY_LENGTH_PROPERTY = "pbkdf2.dkLength";
 
-    public static final String PBKDF2_HASHING_ALGORITHM = "PBKDF2";
-    public static final String DEFAULT_PBKDF2_PRF = "PBKDF2WithHmacSHA256";
-    public static final int DEFAULT_ITERATION_COUNT = 10000;
-    public static final int DEFAULT_DERIVED_KEY_LENGTH = 256;
+    public static final String BCRYPT_HASH_PROVIDER_ERROR_PREFIX = "BC-";
+
+    public static final String COST_FACTOR_PROPERTY = "bcrypt.cost.factor";
+
+    public static final String BCRYPT_HASHING_ALGORITHM = "BCRYPT";
+    public static final int DEFAULT_COST_FACTOR = 12;
+
 
     private Constants() {
 
     }
 }
+
