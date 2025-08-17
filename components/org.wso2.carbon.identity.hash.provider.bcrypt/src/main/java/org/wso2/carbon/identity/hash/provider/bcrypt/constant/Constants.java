@@ -40,7 +40,7 @@ public class Constants {
     public static final String COST_FACTOR_PROPERTY = "bcrypt.cost.factor";
 
     public static final String BCRYPT_HASHING_ALGORITHM = "BCRYPT";
-    public static final int DEFAULT_COST_FACTOR = 12;
+    public static final int DEFAULT_COST_FACTOR = 10;
 
 
     private Constants() {
