@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
  * This class contains the implementation of the Bcrypt hashing algorithm.
@@ -68,9 +69,30 @@ public class BcryptHashProvider implements HashProvider {
         }
     }
 
+//    @Override
+//    public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
+//
+//        // Validate password length based on byte size, not character count.
+//        if (getByteLength(plainText) > BCRYPT_MAX_PLAINTEXT_LENGTH) {
+//            String msg = "Password length exceeds the maximum allowed by Bcrypt (72 bytes).";
+//            throw new HashProviderClientException(msg);
+//        }
+//
+//        try {
+//            // OpenBSDBCrypt.generate handles salt generation internally,
+//            // so the 'salt' parameter passed to this method is not directly used for salting the hash.
+//            String bcryptHash = OpenBSDBCrypt.generate(plainText, salt.getBytes(StandardCharsets.UTF_8), costFactor);
+//            return bcryptHash.getBytes(StandardCharsets.UTF_8);
+//        } catch (Exception e) {
+//            String msg = "Error occurred while generating bcrypt hash.";
+//            log.error(msg, e);
+//            throw new HashProviderServerException(msg, e);
+//        }
+//    }
+
+
     @Override
     public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
-
         // Validate password length based on byte size, not character count.
         if (getByteLength(plainText) > BCRYPT_MAX_PLAINTEXT_LENGTH) {
             String msg = "Password length exceeds the maximum allowed by Bcrypt (72 bytes).";
@@ -78,9 +100,16 @@ public class BcryptHashProvider implements HashProvider {
         }
 
         try {
-            // OpenBSDBCrypt.generate handles salt generation internally,
-            // so the 'salt' parameter passed to this method is not directly used for salting the hash.
-            String bcryptHash = OpenBSDBCrypt.generate(plainText, salt.getBytes(StandardCharsets.UTF_8), costFactor);
+            // Convert salt to bytes and ensure it's 16 bytes long
+            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
+            if (saltBytes.length > 16) {
+                saltBytes = Arrays.copyOf(saltBytes, 16); // Truncate to 16 bytes
+            } else if (saltBytes.length < 16) {
+                // If shorter than 16 bytes, pad with zeros (though this case shouldn't happen)
+                saltBytes = Arrays.copyOf(saltBytes, 16);
+            }
+
+            String bcryptHash = OpenBSDBCrypt.generate(plainText, saltBytes, costFactor);
             return bcryptHash.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             String msg = "Error occurred while generating bcrypt hash.";
@@ -88,6 +117,9 @@ public class BcryptHashProvider implements HashProvider {
             throw new HashProviderServerException(msg, e);
         }
     }
+
+
+
 
     @Override
     public Map<String, Object> getParameters() {
