@@ -1,2 +1,2 @@
-# identity-hash-provider-pbkdf2
-This contains the implementation of PBKDF2 hash provider
+# identity-hash-provider-bcrypt
+This contains the implementation of bcrypt hash provider
