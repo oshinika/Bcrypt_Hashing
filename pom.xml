@@ -46,11 +46,17 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <version>1.70</version>
+                <groupId>org.wso2.orbit.org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bcprov-jdk18.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bcpkix-jdk18.version}</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -276,6 +282,9 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.checkstyleplugin.version>3.1.0</maven.checkstyleplugin.version>
         <carbon.p2.plugin.version>5.1.2</carbon.p2.plugin.version>
+
+        <bcprov-jdk18.version>1.78.1.wso2v1</bcprov-jdk18.version>
+        <bcpkix-jdk18.version>1.78.1.wso2v1</bcpkix-jdk18.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
