@@ -50,13 +50,13 @@
                 <groupId>org.wso2.orbit.org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov-jdk18.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bcpkix-jdk18.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
