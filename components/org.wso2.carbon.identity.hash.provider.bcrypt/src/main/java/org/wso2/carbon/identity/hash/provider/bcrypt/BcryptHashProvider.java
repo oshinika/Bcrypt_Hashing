@@ -1,6 +1,3 @@
-
-
-
 /*
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -69,28 +66,6 @@ public class BcryptHashProvider implements HashProvider {
         }
     }
 
-//    @Override
-//    public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
-//
-//        // Validate password length based on byte size, not character count.
-//        if (getByteLength(plainText) > BCRYPT_MAX_PLAINTEXT_LENGTH) {
-//            String msg = "Password length exceeds the maximum allowed by Bcrypt (72 bytes).";
-//            throw new HashProviderClientException(msg);
-//        }
-//
-//        try {
-//            // OpenBSDBCrypt.generate handles salt generation internally,
-//            // so the 'salt' parameter passed to this method is not directly used for salting the hash.
-//            String bcryptHash = OpenBSDBCrypt.generate(plainText, salt.getBytes(StandardCharsets.UTF_8), costFactor);
-//            return bcryptHash.getBytes(StandardCharsets.UTF_8);
-//        } catch (Exception e) {
-//            String msg = "Error occurred while generating bcrypt hash.";
-//            log.error(msg, e);
-//            throw new HashProviderServerException(msg, e);
-//        }
-//    }
-
-
     @Override
     public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
         // Validate password length based on byte size, not character count.
@@ -156,3 +131,4 @@ public class BcryptHashProvider implements HashProvider {
         return new String(chars).getBytes(StandardCharsets.UTF_8).length;
     }
 }
+
