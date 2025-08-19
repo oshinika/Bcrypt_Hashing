@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2025, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,11 +28,6 @@ public class Constants {
     public static final String COST_FACTOR_PROPERTY = "bcrypt.cost.factor";
 
     public static final String BCRYPT_HASHING_ALGORITHM = "BCRYPT";
-    public static final int DEFAULT_COST_FACTOR = 10;
+    public static final int DEFAULT_COST_FACTOR = 12;
 
-
-    private Constants() {
-
-    }
 }
-

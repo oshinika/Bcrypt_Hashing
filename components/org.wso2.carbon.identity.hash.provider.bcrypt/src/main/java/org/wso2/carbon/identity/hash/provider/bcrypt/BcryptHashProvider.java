@@ -15,9 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+ // TODO : 2025 in all classes
 package org.wso2.carbon.identity.hash.provider.bcrypt;
 
+//TODO : order imports
+import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.wso2.carbon.identity.hash.provider.bcrypt.constant.Constants;
 import org.wso2.carbon.user.core.exceptions.HashProviderClientException;
@@ -40,7 +42,7 @@ public class BcryptHashProvider implements HashProvider {
 
     private static final Log log = LogFactory.getLog(BcryptHashProvider.class);
     // Bcrypt has a hard limit of 72 bytes for the plaintext password.
-    private static final int BCRYPT_MAX_PLAINTEXT_LENGTH = 72;
+    private static final int BCRYPT_MAX_PLAINTEXT_LENGTH = 72; // TODO : constants
 
     private int costFactor;
 
@@ -68,15 +70,22 @@ public class BcryptHashProvider implements HashProvider {
 
     @Override
     public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
+
+        //TODO: check is there a way to have a password more than 72 chars
         // Validate password length based on byte size, not character count.
         if (getByteLength(plainText) > BCRYPT_MAX_PLAINTEXT_LENGTH) {
             String msg = "Password length exceeds the maximum allowed by Bcrypt (72 bytes).";
             throw new HashProviderClientException(msg);
         }
 
+        // TODO : reproduce OKTA issue
+        // TODO: correct the above code
+
         try {
             // Convert salt to bytes and ensure it's 16 bytes long
-            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
+            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8); // TODO : check salt for null
+            // TODO : check for encoding decoding
+            // TODO : make the below logic configurable
             if (saltBytes.length > 16) {
                 saltBytes = Arrays.copyOf(saltBytes, 16); // Truncate to 16 bytes
             } else if (saltBytes.length < 16) {
@@ -86,7 +95,7 @@ public class BcryptHashProvider implements HashProvider {
 
             String bcryptHash = OpenBSDBCrypt.generate(plainText, saltBytes, costFactor);
             return bcryptHash.getBytes(StandardCharsets.UTF_8);
-        } catch (Exception e) {
+        } catch (Exception e) { // TODO : exception type
             String msg = "Error occurred while generating bcrypt hash.";
             log.error(msg, e);
             throw new HashProviderServerException(msg, e);
@@ -115,6 +124,7 @@ public class BcryptHashProvider implements HashProvider {
      * @throws HashProviderClientException If the cost factor is less than or equal to zero.
      */
     private void validateCostFactor(int costFactor) throws HashProviderClientException {
+
         if (costFactor <= 0) {
             String msg = "Bcrypt cost factor must be a positive integer.";
             throw new HashProviderClientException(msg);
@@ -128,6 +138,7 @@ public class BcryptHashProvider implements HashProvider {
      * @return The byte length of the character array.
      */
     private int getByteLength(char[] chars) {
+
         return new String(chars).getBytes(StandardCharsets.UTF_8).length;
     }
 }

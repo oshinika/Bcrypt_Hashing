@@ -1,6 +1,3 @@
-
-
-
 /*
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -42,11 +39,11 @@ public class BcryptHashServiceComponent {
     private static final Log log = LogFactory.getLog(BcryptHashServiceComponent.class);
 
     @Activate
-    protected void activate(ComponentContext ctxt) {
+    protected void activate(ComponentContext componentContext) {
 
         try {
             HashProviderFactory hashProviderFactory = new BcryptHashProviderFactory();
-            ctxt.getBundleContext().registerService(HashProviderFactory.class.getName(),
+            componentContext.getBundleContext().registerService(HashProviderFactory.class.getName(),
                     hashProviderFactory, null);
 
             if (log.isDebugEnabled()) {
@@ -58,7 +55,7 @@ public class BcryptHashServiceComponent {
     }
 
     @Deactivate
-    protected void deactivate(ComponentContext ctxt) {
+    protected void deactivate(ComponentContext componentContext) {
 
         if (log.isDebugEnabled()) {
             log.debug("Bcrypt bundle is deactivated.");
