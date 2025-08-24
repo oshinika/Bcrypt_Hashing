@@ -212,11 +212,11 @@ public class BcryptHashProvider implements HashProvider {
         }
     }
 
+
     @Override
     public byte[] calculateHash(char[] plainText, String salt) throws HashProviderException {
         validatePassword(plainText);
 
-        // Validate password length based on UTF-8 byte size
         int byteLength = getUtf8ByteLength(plainText);
         if (byteLength > Constants.BCRYPT_MAX_PLAINTEXT_LENGTH) {
             throw new HashProviderClientException(
@@ -227,18 +227,18 @@ public class BcryptHashProvider implements HashProvider {
             byte[] saltBytes;
 
             if (StringUtils.isNotEmpty(salt)) {
-                // Use provided salt (for migration and verification)
                 saltBytes = Base64.getDecoder().decode(salt);
-                if (saltBytes.length != BCRYPT_SALT_LENGTH) {
+                if (saltBytes.length != Constants.BCRYPT_SALT_LENGTH) {
                     throw new HashProviderClientException(
                             "Salt must be exactly 16 bytes when decoded. Got: " + saltBytes.length + " bytes");
                 }
             } else {
-                // Generate new salt (for new password creation)
-                saltBytes = generateSalt();
+                String msg = "A salt must be provided for hashing.";
+                log.error(msg);
+                throw new HashProviderClientException(msg);
             }
 
-            String bcryptHash = OpenBSDBCrypt.generate(version,plainText, saltBytes, costFactor);
+            String bcryptHash = OpenBSDBCrypt.generate(version, plainText, saltBytes, costFactor);
 
             if (log.isDebugEnabled()) {
                 log.debug("Generated BCrypt hash: " + bcryptHash);
@@ -258,14 +258,6 @@ public class BcryptHashProvider implements HashProvider {
         }
     }
 
-    /**
-     * Generate a secure random salt for BCrypt (16 bytes required)
-     */
-    private byte[] generateSalt() {
-        byte[] salt = new byte[BCRYPT_SALT_LENGTH];
-        secureRandom.nextBytes(salt);
-        return salt;
-    }
 
     @Override
     public Map<String, Object> getParameters() {
