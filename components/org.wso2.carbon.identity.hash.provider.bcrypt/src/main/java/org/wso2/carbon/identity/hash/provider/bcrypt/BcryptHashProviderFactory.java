@@ -50,6 +50,8 @@ public class BcryptHashProviderFactory implements HashProviderFactory {
     public Set<String> getHashProviderConfigProperties() {
         Set<String> metaProperties = new HashSet<>();
         metaProperties.add(Constants.COST_FACTOR_PROPERTY);
+        metaProperties.add(Constants.VERSION_PROPERTY);
+
         return metaProperties;
     }
 

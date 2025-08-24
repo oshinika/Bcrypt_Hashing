@@ -26,10 +26,11 @@ public class Constants {
     public static final String BCRYPT_HASH_PROVIDER_ERROR_PREFIX = "BC-";
 
     public static final String COST_FACTOR_PROPERTY = "bcrypt.cost.factor";
+    public static final String VERSION_PROPERTY = "bcrypt.version";
 
     public static final String BCRYPT_HASHING_ALGORITHM = "BCRYPT";
     public static final int DEFAULT_COST_FACTOR = 12;
     public static final int BCRYPT_MAX_PLAINTEXT_LENGTH = 72;
     public static final int BCRYPT_SALT_LENGTH = 16;
-    public static final String version= "2a";
+    public static final String DEFAULT_BCRYPT_VERSION= "2a";
 }
