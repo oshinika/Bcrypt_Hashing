@@ -100,16 +100,43 @@ public class BcryptHashProviderTest {
         bcryptHashProvider.calculateHash(new char[0], validSalt);
     }
 
-    @Test(expectedExceptions = HashProviderClientException.class)
-    public void testCalculateHashWithNullSalt() throws Exception {
+    @Test
+    public void testCalculateHashWithNullSaltGeneratesNewSalt() throws Exception {
         char[] password = "testPassword".toCharArray();
-        bcryptHashProvider.calculateHash(password, null);
+
+        byte[] hash = bcryptHashProvider.calculateHash(password, null);
+
+        assertNotNull(hash);
+        assertTrue(hash.length > 0);
+        // Verify it's a valid BCrypt hash
+        String hashString = new String(hash, StandardCharsets.UTF_8);
+        assertTrue(hashString.startsWith("$2a$"));
     }
 
-    @Test(expectedExceptions = HashProviderClientException.class)
-    public void testCalculateHashWithEmptySalt() throws Exception {
+    @Test
+    public void testCalculateHashWithEmptySaltGeneratesNewSalt() throws Exception {
         char[] password = "testPassword".toCharArray();
-        bcryptHashProvider.calculateHash(password, "");
+
+        byte[] hash = bcryptHashProvider.calculateHash(password, "");
+
+        assertNotNull(hash);
+        assertTrue(hash.length > 0);
+        // Verify it's a valid BCrypt hash
+        String hashString = new String(hash, StandardCharsets.UTF_8);
+        assertTrue(hashString.startsWith("$2a$"));
+    }
+
+    @Test
+    public void testNullSaltAndEmptySaltProduceDifferentHashes() throws Exception {
+        char[] password = "testPassword".toCharArray();
+
+        byte[] hashWithNullSalt = bcryptHashProvider.calculateHash(password, null);
+        byte[] hashWithEmptySalt = bcryptHashProvider.calculateHash(password, "");
+
+        assertNotNull(hashWithNullSalt);
+        assertNotNull(hashWithEmptySalt);
+        // They should be different because different random salts were generated
+        assertNotEquals(hashWithNullSalt, hashWithEmptySalt);
     }
 
     @Test(expectedExceptions = HashProviderClientException.class)
@@ -236,6 +263,61 @@ public class BcryptHashProviderTest {
         assertTrue(hashString.startsWith("$2a$"));
         assertTrue(hashString.length() >= 60); // Minimum BCrypt hash length
         assertEquals(hashString.split("\\$").length, 4);
+    }
+
+    @Test(expectedExceptions = HashProviderClientException.class)
+    public void testInitWithInvalidVersion() throws Exception {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("bcrypt.version", "2x"); // Invalid version
+
+        bcryptHashProvider.init(properties);
+    }
+
+    @Test
+    public void testInitWithValidVersions() throws Exception {
+        String[] validVersions = {"2a", "2y", "2b"};
+
+        for (String version : validVersions) {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("bcrypt.version", version);
+
+            bcryptHashProvider.init(properties);
+            // Verify the version was set correctly
+            Map<String, Object> params = bcryptHashProvider.getParameters();
+            assertEquals(params.get("bcrypt.version"), version);
+        }
+    }
+
+    @Test
+    public void testSupportsValidateHash() {
+        assertTrue(bcryptHashProvider.supportsValidateHash());
+    }
+
+    @Test
+    public void testValidateHashWithCorrectPassword() throws Exception {
+        char[] password = "testPassword".toCharArray();
+        byte[] hash = bcryptHashProvider.calculateHash(password, validSalt);
+        String hashString = new String(hash, StandardCharsets.UTF_8);
+
+        assertTrue(bcryptHashProvider.validateHash(password, hashString, validSalt));
+    }
+
+    @Test
+    public void testValidateHashWithIncorrectPassword() throws Exception {
+        char[] password = "testPassword".toCharArray();
+        char[] wrongPassword = "wrongPassword".toCharArray();
+        byte[] hash = bcryptHashProvider.calculateHash(password, validSalt);
+        String hashString = new String(hash, StandardCharsets.UTF_8);
+
+        assertFalse(bcryptHashProvider.validateHash(wrongPassword, hashString, validSalt));
+    }
+
+    @Test
+    public void testGetUtf8ByteLength() {
+        assertEquals(bcryptHashProvider.getUtf8ByteLength(null), 0);
+        assertEquals(bcryptHashProvider.getUtf8ByteLength(new char[0]), 0);
+        assertEquals(bcryptHashProvider.getUtf8ByteLength("a".toCharArray()), 1);
+        assertEquals(bcryptHashProvider.getUtf8ByteLength("测试".toCharArray()), 6); // 3 bytes per Chinese char
     }
 
     // Helper methods for creating test passwords

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2025, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -89,7 +90,17 @@ public class BcryptHashProvider implements HashProvider {
             throw new HashProviderClientException("Password cannot be null or empty");
         }
 
-        validateSalt(salt);
+        // Generate salt if null or empty.
+        String actualSalt = salt;
+        if (StringUtils.isEmpty(actualSalt)) {
+            actualSalt = generateSalt();
+            if (log.isDebugEnabled()) {
+                log.debug("Generated new salt since none was provided.");
+            }
+        } else {
+            // Validate the provided salt.
+            validateSalt(actualSalt);
+        }
 
         int byteLength = getUtf8ByteLength(plainText);
         if (byteLength > Constants.BCRYPT_MAX_PLAINTEXT_LENGTH) {
@@ -99,14 +110,13 @@ public class BcryptHashProvider implements HashProvider {
 
         byte[] saltBytes;
         try {
-            saltBytes = Base64.getDecoder().decode(salt);
+            saltBytes = Base64.getDecoder().decode(actualSalt);
         } catch (IllegalArgumentException e) {
-            String msg = "Invalid Base64 salt format";
+            String msg = "Invalid Base64 salt format.";
             log.error(msg, e);
             throw new HashProviderServerException(msg, e);
         }
 
-        // Validate salt length after decoding
         if (saltBytes.length != BCRYPT_SALT_LENGTH) {
             throw new HashProviderClientException(
                     "Salt must be exactly 16 bytes when decoded. Got: " + saltBytes.length + " bytes");
@@ -114,16 +124,12 @@ public class BcryptHashProvider implements HashProvider {
 
         try {
             String bcryptHash = OpenBSDBCrypt.generate(version, plainText, saltBytes, costFactor);
-
             if (log.isDebugEnabled()) {
-                log.debug("Generated BCrypt hash: " + bcryptHash);
-                log.debug("Hash length: " + bcryptHash.length() + " characters");
+                log.debug("Generated BCrypt hash.");
             }
-
             return bcryptHash.getBytes(StandardCharsets.UTF_8);
-
         } catch (Exception e) {
-            String msg = "Error generating BCrypt hash";
+            String msg = "Error generating BCrypt hash.";
             log.error(msg, e);
             throw new HashProviderServerException(msg, e);
         }
@@ -142,8 +148,42 @@ public class BcryptHashProvider implements HashProvider {
         return Constants.BCRYPT_HASHING_ALGORITHM;
     }
 
+    public boolean supportsValidateHash() {
+        return true;
+    }
+
+    public boolean validateHash(char[] plainText, String storedHash, String salt) throws HashProviderException {
+        // BCrypt's checkPassword method is self-contained and does not use a separate salt.
+        // The salt is embedded in the storedHash.
+        if (plainText == null || storedHash == null) {
+            return false;
+        }
+
+        if (plainText.length == 0 || storedHash.length() != 60) {
+            return false;
+        }
+
+        try {
+            return OpenBSDBCrypt.checkPassword(storedHash, plainText);
+        } catch (Exception e) {
+            log.error("BCrypt validation error.", e);
+            return false;
+        }
+    }
+
     /**
-     * Validate cost factor is within acceptable bounds (4-31)
+     * Generates a new random salt for hashing.
+     *
+     * @return The Base64 encoded salt string.
+     */
+    public String generateSalt() {
+        byte[] saltBytes = new byte[BCRYPT_SALT_LENGTH];
+        secureRandom.nextBytes(saltBytes);
+        return Base64.getEncoder().encodeToString(saltBytes);
+    }
+
+    /**
+     * Validate cost factor is within acceptable bounds (4-31).
      */
     private void validateCostFactor(int costFactor) throws HashProviderClientException {
         if (costFactor < 4) {
@@ -157,7 +197,7 @@ public class BcryptHashProvider implements HashProvider {
     }
 
     /**
-     * Validate BCrypt version is supported
+     * Validate BCrypt version is supported.
      */
     private void validateVersion(String version) throws HashProviderClientException {
         if (version == null || (!version.equals("2a") && !version.equals("2y") && !version.equals("2b"))) {
@@ -167,21 +207,21 @@ public class BcryptHashProvider implements HashProvider {
     }
 
     /**
-     * Validate salt is not null, empty, and properly formatted
+     * Validate salt is not null and empty.
      */
     private void validateSalt(String salt) throws HashProviderClientException {
         if (salt == null) {
-            throw new HashProviderClientException("Salt cannot be null");
+            throw new HashProviderClientException("Salt cannot be null.");
         }
         if (StringUtils.isEmpty(salt)) {
-            throw new HashProviderClientException("Salt cannot be empty");
+            throw new HashProviderClientException("Salt cannot be empty.");
         }
     }
 
     /**
-     * Calculate UTF-8 byte length of password
+     * Calculate UTF-8 byte length of password.
      */
-    private int getUtf8ByteLength(char[] chars) {
+    int getUtf8ByteLength(char[] chars) {
         if (chars == null || chars.length == 0) {
             return 0;
         }
