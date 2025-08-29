@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2025, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -26,7 +26,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.identity.hash.provider.pbkdf2</groupId>
+    <groupId>org.wso2.carbon.identity.hash.provider.bcrypt</groupId>
     <artifactId>identity-hash-provider-bcrypt</artifactId>
     <version>0.1.7</version>
     <packaging>pom</packaging>
@@ -34,9 +34,9 @@
     <url>http://wso2.org</url>
 
     <scm>
-        <connection>scm:git:https://github.com/wso2-extensions/identity-hash-provider-pbkdf2.git</connection>
-        <developerConnection>scm:git:https://github.com/wso2-extensions/identity-hash-provider-pbkdf2.git</developerConnection>
-        <url>https://github.com/wso2-extensions/identity-hash-provider-pbkdf2.git</url>
+        <connection>scm:git:https://github.com/wso2-extensions/identity-hash-provider-bcrypt.git</connection>
+        <developerConnection>scm:git:https://github.com/wso2-extensions/identity-hash-provider-bcrypt.git</developerConnection>
+        <url>https://github.com/wso2-extensions/identity-hash-provider-bcrypt.git</url>
         <tag>v0.1.7</tag>
     </scm>
 
@@ -90,12 +90,12 @@
                 <version>${commons.logging.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.hash.provider.pbkdf2</groupId>
+                <groupId>org.wso2.carbon.identity.hash.provider.bcrypt</groupId>
                 <artifactId>bcrypt</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.hash.provider.pbkdf2</groupId>
+                <groupId>org.wso2.carbon.identity.hash.provider.bcrypt</groupId>
                 <artifactId>feature</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
@@ -115,10 +115,7 @@
                 <classifier>runtime</classifier>
                 <version>${jacoco.version}</version>
                 <scope>test</scope>
-
             </dependency>
-
-
 
             <dependency>
                 <groupId>org.powermock</groupId>
@@ -201,7 +198,7 @@
                     <executions>
                         <execution>
                             <id>validate</id>
-                            <phase>none</phase>
+                            <phase>validate</phase>
                             <configuration>
                                 <configLocation>
                                     https://raw.githubusercontent.com/wso2/code-quality-tools/v1.3/checkstyle/checkstyle.xml

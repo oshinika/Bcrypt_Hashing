@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2025, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.identity.hash.provider.bcrypt;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.wso2.carbon.identity.hash.provider.bcrypt.constant.Constants;
 import org.wso2.carbon.user.core.exceptions.HashProviderException;
 import org.wso2.carbon.user.core.hash.HashProvider;
 import org.wso2.carbon.user.core.hash.HashProviderFactory;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The class contains the implementation of Bcrypt HashProvider Factory.
