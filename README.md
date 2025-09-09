@@ -106,7 +106,7 @@ BCrypt is supported by JDBC user stores but must be enabled in the deployment.to
     </tbody>
     </table>
 
-
+5. Click **Update** to save the configurations.
 
 
 
