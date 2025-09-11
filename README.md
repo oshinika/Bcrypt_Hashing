@@ -13,34 +13,36 @@ This section guides you on how to configure BCrypt hashing on primary and second
 
 ### BCrypt for primary JDBC user stores
 
-BCrypt is supported by JDBC user stores but must be enabled in the deployment.toml file before initial server startup. Since BCrypt automatically generates a unique, cryptographically strong salt for each password, you must also disable the user store's external salt handling for it to function correctly before initial server startup.
+BCrypt is supported by 
+[primary JDBC user stores](https://is.docs.wso2.com/en/7.0.0/guides/users/user-stores/primary-user-store/configure-a-jdbc-user-store/) but must be enabled in the deployment.toml file before initial server startup. Since BCrypt automatically generates a unique, cryptographically strong salt for each password, you must also disable the user store's external salt handling for it to function correctly before initial server startup.
 
 #### Step 1: Add the BCrypt Algorithm
 
-1. Open the deployment.toml file located in the <IS_HOME>/repository/conf directory.
+1. Open the deployment.toml file located in the `<IS_HOME>/repository/` conf directory.
 
 2. Add the following configuration under the [user_store] section.
 
-    [user_store]\
+    `[user_store]`\
     type = "database_unique_id"\
     password_digest="BCRYPT"
 
 #### Step 2: Turn Off External Salt
 
-1. Open the deployment.toml file and add the following configuration under the [user_store.properties] section. If the section does not exist, you    can create it.
+1. Open the deployment.toml file and add the following configuration under the `[user_store.properties]` section. If the section does not exist, you    can create it.
 
+   `[user_store.properties]`\
    StoreSaltedPassword = "false"
 
 ### BCrypt for secondary JDBC user stores
 
-1. Login to the Identity Server management console (https://<IS_HOST>:<PORT>/console) and create a JDBC user store.
+1. Login to the Identity Server management console (`https://<IS_HOST>:<PORT>/console`) and [create a JDBC user store](https://is.docs.wso2.com/en/7.0.0/guides/users/user-stores/configure-secondary-user-stores/).
 
 > [!NOTE]
 > - You may also use an existing user store which does not have any users in it. If you already have users in the user store, once the hashing algorithm is configured these users will not be able to get authenticated.
 >
 > - Such cases will impact with bad user experience as the users will not get authenticated even when they try to login using the correct  credentials. Admins may use the following approaches to reset the user passwords after configuring the BCrypt hashing algorithm on an existing user store:
 >   - Ask users to reset their own passwords.
->   - Trigger password reset for all accounts of the user store using admin initiated password reset.
+>   - Trigger password reset for all accounts of the user store using [admin initiated password reset](https://is.docs.wso2.com/en/7.0.0/guides/users/manage-users/#reset-the-users-password).
 
 2. Navigate to **User Attributes & Stores > User Stores**, select the secondary JDBC user store you have created.
    
@@ -66,7 +68,7 @@ BCrypt is supported by JDBC user stores but must be enabled in the deployment.to
     </tr>
     <tr class="even">
     <td>UserStore Hashing Configurations</td>
-    <td>{bcrypt.version:2a,  bcrypt.cost.factor:12}</td>
+    <td>{bcrypt.version:2a,bcrypt.cost.factor:12}</td>
     <td>Additional parameters required for password hashing algorithm. This should be given in JSON format. Learn more about these configurations.</td>
     </tr>
     </tbody>
