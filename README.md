@@ -99,7 +99,7 @@ BCrypt is supported by JDBC user stores but must be enabled in the deployment.to
     </tr>
     <tr class="even">
     <td>bcrypt.cost.factor</td>
-    <td>Cost factor of BCrypt algorithm</td>
+    <td>Cost factor of the BCrypt algorithm</td>
     <td>12</td>
     <td>4 - 31</td>
     </tr>
