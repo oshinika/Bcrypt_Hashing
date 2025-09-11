@@ -86,8 +86,8 @@ BCrypt is supported by JDBC user stores but must be enabled in the deployment.to
     <tr class="header">
     <th>Parameter</th>
     <th>Parameter name</th>
-    <th>Recommended Value</th>
-    <th>Other Recommende Values</th>
+    <th>Default Value</th>
+    <th>Other Recommended Values</th>
     </tr>
     </thead>
     <tbody>
