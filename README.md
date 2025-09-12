@@ -70,7 +70,7 @@ This section guides you on how to configure Bcrypt hashing on primary and second
 
 5. Click **Update** to save the configurations.
 
-   Successful updation of these configurations will convert the password hashing algorithm of the user store to BCRYPT.
+   Successful updation of these configurations will convert the password hashing algorithm of the user store to Bcrypt.
 
 > [!NOTE]
 >  **Existing user stores**
