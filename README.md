@@ -4,12 +4,12 @@ Bcrypt is recognized as a password hashing function that is designed to protect 
 
 > [!NOTE]
 > * Currently, Bcrypt supports only JDBC user stores of WSO2 Identity Server.
-> * It should be noted that the Bcrypt hashing algorithm is supported for WSO2 Identity Server version starting from 7.1.0, specifically at update levels 24 and above.
+> * It should be noted that in WSO2 Identity Server version 7.1.0,the Bcrypt hashing algorithm is supported specifically at update levels 24 and above.
 
 ## Configure Bcrypt hashing
 
 This section guides you on how to configure Bcrypt hashing on primary and secondary JDBC user stores.
-* Place the org.wso2.carbon.identity.hash.provider.bcrypt-*.*.*.jar file into the`<IS_HOME>/repository/components/dropins` directory. You can download the connector from the [WSO2 Store](https://store.wso2.com/connector/identity-hash-provider-bcrypt).
+* Place the `org.wso2.carbon.identity.hash.provider.bcrypt-*.*.*.jar` file into the`<IS_HOME>/repository/components/dropins` directory. You can download the connector from the [WSO2 Store](https://store.wso2.com/connector/identity-hash-provider-bcrypt).
 ### Bcrypt for primary JDBC user store
 
 > [!NOTE]
@@ -62,7 +62,7 @@ This section guides you on how to configure Bcrypt hashing on primary and second
     <td>Determines whether passwords are stored with an additional salt. For bcrypt, this should be set to false.</td>
     </tr>
     <tr class="even">
-    <td>UserStore Hashing Configurations (optional)</td>
+    <td>UserStore Hashing <a href="#bcrypt-parameters">Configurations</a> (optional)</td>
     <td><code>{bcrypt.version:2b,bcrypt.cost.factor:12}</code></td>
     <td>Additional parameters required for password hashing algorithm. This should be given in JSON format.</td>
         </tbody>
@@ -110,7 +110,7 @@ This section guides you on how to configure Bcrypt hashing on primary and second
 </table>
 
 >[!NOTE]
->Passwords must be 72 bytes or fewer when using the Bcrypt hashing algorithm. Using longer passwords may result in errors or failed authentication.
+>Passwords must be 72 characters or fewer when using the Bcrypt hashing algorithm. For guidance on creating valid passwords, refer to the [documentation](https://is.docs.wso2.com/en/7.1.0/guides/account-configurations/login-security/password-validation/#password-input-validation).
    
 
 
