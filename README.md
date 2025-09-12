@@ -1,17 +1,15 @@
 # Bcrypt Hashing
 
-Bcrypt is recognized as a password hashing function that is designed to safeguard sensitive data through the production of strong, non-reversible hashes. Salting and an adjustable cost factor are utilized to resist brute-force and pre-computed attacks. Bcrypt hashing method can be used to securely store user passwords in user stores.
-
-This guide walks you through the steps of configuring Bcrypt as the hashing algorithm of a JDBC user store.
+Bcrypt is recognized as a password hashing function that is designed to protect sensitive data through generating strong, non-reversible hashes. non-reversible hashes. Salting and an adjustable cost factor are utilized to resist brute-force and pre-computed attacks. This makes it an ideal choice for securely storing credentials in user stores.
 
 > [!NOTE]
-> * It should be noted that the Bcrypt hashing algorithm is supported only for WSO2 Identity Server version 7.1.0, specifically at update levels 24 and above.
 > * Currently, Bcrypt supports only JDBC user stores of WSO2 Identity Server.
+> * It should be noted that the Bcrypt hashing algorithm is supported for WSO2 Identity Server version starting from 7.1.0, specifically at update levels 24 and above.
 
 ## Configure Bcrypt hashing
 
 This section guides you on how to configure Bcrypt hashing on primary and secondary JDBC user stores.
-* Place the org.wso2.carbon.identity.hash.provider.bcrypt-***.jar file into the`<IS_HOME>/repository/components/dropins` directory. You can download the connector from the [WSO2 Store](https://store.wso2.com/connector/identity-hash-provider-bcrypt).
+* Place the org.wso2.carbon.identity.hash.provider.bcrypt-*.*.*.jar file into the`<IS_HOME>/repository/components/dropins` directory. You can download the connector from the [WSO2 Store](https://store.wso2.com/connector/identity-hash-provider-bcrypt).
 ### Bcrypt for primary JDBC user store
 
 > [!NOTE]
@@ -20,7 +18,7 @@ This section guides you on how to configure Bcrypt hashing on primary and second
 
 1. Open the deployment.toml file located in the `<IS_HOME>/repository/conf` directory.
 
-2. Add the following configuration under the `[user_store.properties]` section. If the section does not exist, you can add it.
+2. Add the following configurations under the `[user_store.properties]` section. If the section does not exist, you can add it.
 
    ```bash
      [user_store.properties]
@@ -28,7 +26,9 @@ This section guides you on how to configure Bcrypt hashing on primary and second
      StoreSaltedPassword = "false"
     "Hash.Algorithm.Properties" = "{bcrypt.version:2a,bcrypt.cost.factor:10}"
    ```
-* The `Hash.Algorithm.Properties` configuration is optional and may be omitted if the default values are sufficient for the deployment.
+3. Restart the WSO2 Identity Server.
+
+* The `Hash.Algorithm.Properties` [configuration](#bcrypt-parameters) is optional and may be omitted if the default values are sufficient for the deployment.
   
 * If Bcrypt is not defined during the initial server startup, existing passwords will not be hashed using Bcrypt. In such cases, administrators will need to [reset user passwords](https://is.docs.wso2.com/en/latest/guides/account-configurations/account-recovery/password-recovery/) after enabling Bcrypt.
   
@@ -53,17 +53,17 @@ This section guides you on how to configure Bcrypt hashing on primary and second
     <tbody>
     <tr class="odd">
     <td>Password Hashing Algorithm</td>
-    <td>BCRYPT</td>
+    <td><code>BCRYPT</code></td>
     <td>Name of the hashing algorithm supported by the user store.</td>
     </tr>
     <tr class = "odd">
     <td>Enable Salted Passwords</td>
-    <td>false</td>
+    <td><code>false</code></td>
     <td>Determines whether passwords are stored with an additional salt. For bcrypt, this should be set to false.</td>
     </tr>
     <tr class="even">
     <td>UserStore Hashing Configurations (optional)</td>
-    <td>{bcrypt.version:2b,bcrypt.cost.factor:12}</td>
+    <td><code>{bcrypt.version:2b,bcrypt.cost.factor:12}</code></td>
     <td>Additional parameters required for password hashing algorithm. This should be given in JSON format.</td>
         </tbody>
     </table>
@@ -76,39 +76,41 @@ This section guides you on how to configure Bcrypt hashing on primary and second
 >  **Existing user stores**
 > - You may also use an existing user store which does not have any users in it. If you already have users in the user store, once the hashing algorithm is configured these users will not be able to get authenticated.
 >
-> - Such cases will impact with bad user experience as the users will not get authenticated even when they try to login using the correct  credentials. Admins may use the following approaches to reset the user passwords after configuring the BCrypt hashing algorithm on an existing user store:
+> - In such cases users will not get authenticated even when they try to login using the correct  credentials. Admins may use the following approaches to reset the user passwords after configuring the Bcrypt hashing algorithm on an existing user store:
 >   - Ask users to reset their own passwords.
 >   - Trigger password reset for all accounts of the user store using [admin initiated password reset](https://is.docs.wso2.com/en/7.0.0/guides/users/manage-users/#reset-the-users-password).
 
-   ### BCrypt parameters
+### Bcrypt parameters 
 
-   When configuring the BCrypt hashing algorithm the following parameters must be specified in the configurations:
+   When configuring the Bcrypt hashing algorithm the following parameters must be specified in the configurations:
    
    <table>
   <thead>
     <tr class="header">
-      <th>Parameter Name</th>
+      <th >Parameter Name</th>
       <th>Description</th>
       <th>Default Value</th>
-      <th>Other Recommended Values</th>
+      <th>Possible Values</th>
     </tr>
   </thead>
   <tbody>
     <tr class="odd">
-      <td>bcrypt.version</td>
-      <td>Version of the BCrypt algorithm</td>
-      <td>2b</td>
-      <td>2a, 2y</td>
+      <td><code>bcrypt.version</code></td>
+      <td>Version of the Bcrypt algorithm</td>
+      <td><code>2b</code></td>
+      <td><code>2a</code> <code>2b</code> <code>2y</code></td>
     </tr>
     <tr class="even">
-      <td>bcrypt.cost.factor</td>
-      <td>Cost factor of the BCrypt algorithm</td>
-      <td>12</td>
-      <td>4 - 31</td>
+      <td><code>bcrypt.cost.factor</code></td>
+      <td>Cost factor of the Bcrypt algorithm</td>
+      <td><code>12</code></td>
+      <td><code>4 - 31</code></td>
     </tr>
   </tbody>
 </table>
 
+>[!NOTE]
+>Passwords must be 72 bytes or fewer when using the Bcrypt hashing algorithm. Using longer passwords may result in errors or failed authentication.
    
 
 
